@@ -3,24 +3,21 @@ import bcrypt from "bcrypt";
 import userSchema from "../model/model.user.js";
 
 export async function userRegistration(req, res) {
-    const { name, email, password, cpassword, address, profile, usertype } = req.body;
-    console.log(name, email, password, cpassword, address, profile);
-
-    if (!(name && email && password && cpassword && address && profile && usertype)) {
-        return res.status(400).send({ message: "All fields are required." });
-    }
-
-    // Validate email format
-    // const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    // if (!emailRegex.test(email)) {
-    //     return res.status(400).send({ message: "Invalid email format." });
-    // }
-
-    if (password !== cpassword) {
-        return res.status(400).send({ message: "Password and confirm password do not match." });
-    }
-
     try {
+        // Log the incoming request body
+        console.log('Request body:', req.body);
+
+        const { name, email, password, cpassword, address, usertype } = req.body;
+        console.log(name, email, password, cpassword, address,usertype);
+
+        if (!(name && email && password && cpassword && address  && usertype)) {
+            return res.status(400).send({ message: "All fields are required." });
+        }
+
+        if (password !== cpassword) {
+            return res.status(400).send({ message: "Password and confirm password do not match." });
+        }
+
         console.log("Processing user registration...");
         const data = await userSchema.findOne({ email });
 
@@ -28,17 +25,17 @@ export async function userRegistration(req, res) {
             return res.status(400).send({ message: "User already exists." });
         }
 
-        // Hash the password
         const hpassword = await bcrypt.hash(password, 10);
+        await userSchema.create({ name, email, password: hpassword, address, usertype });
 
-        // Save the new user
-        await userSchema.create({ name, email, password: hpassword, address, profile, usertype });
         return res.status(200).send({ message: "User created successfully." });
+
     } catch (error) {
         console.error("Error during registration:", error);
         res.status(500).send({ message: "Something went wrong. Please try again later." });
     }
 }
+
 
 export async function userlogin(req, res) {
     const { email, password } = req.body;

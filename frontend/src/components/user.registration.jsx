@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
@@ -8,28 +9,32 @@ const RegistrationPage = () => {
     password: '',
     cpassword: '',
     address: '',
-    profile: null,
     usertype: 'customer',
   });
+      const navigate=useNavigate()
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Handling input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, profile: e.target.files[0] });
-  };
-
-  const handleSubmit = (e) => {
+  // Form submit handler
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
 
+    // Log the formData to check the values before sending the request
+    console.log('Form data before submit:', formData);
+
     // Validate form fields
-    if (!(formData.name && formData.email && formData.password && formData.cpassword && formData.address && formData.profile)) {
+    if (!(formData.name && formData.email && formData.password && formData.cpassword && formData.address)) {
       setErrorMessage('Please fill in all fields');
       return;
     }
@@ -38,24 +43,28 @@ const RegistrationPage = () => {
       return;
     }
 
-    // Call API (this part is simulated)
-    setTimeout(async() => {
-        const res= await axios.post("http://localhost:3000/api/userregistration",formData);
-        const result=await res.data;
-        if(res.status==200){
-            setSuccessMessage(result.message);
-        }
-        else{
-            setErrorMessage(result.message);
-        }
-    }, 2000);
+    try {
+      const res = await axios.post('http://localhost:3000/api/userregistration', formData);
+      const result = res.data;
+
+      if (res.status === 200) {
+        setSuccessMessage(result.message); 
+        navigate("/userlogin")
+      } else {
+        setErrorMessage(result.message); 
+        console.log(result.message);
+      }
+    } catch (error) {
+      setErrorMessage('Something went wrong! Please try again later.');
+      console.log(error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center p-5">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full">
         <h2 className="text-2xl font-semibold text-center text-gray-700 mb-6">Create Your Account</h2>
-        
+
         {errorMessage && <div className="bg-red-200 text-red-600 p-3 mb-4 rounded">{errorMessage}</div>}
         {successMessage && <div className="bg-green-200 text-green-600 p-3 mb-4 rounded">{successMessage}</div>}
 
@@ -124,25 +133,14 @@ const RegistrationPage = () => {
             />
           </div>
 
-          <div>
-            <label htmlFor="profile" className="block text-sm font-medium text-gray-600">Profile Picture</label>
-            <input
-              type="file"
-              id="profile"
-              name="profile"
-              onChange={handleFileChange}
-              className="w-full text-gray-600 file:bg-blue-500 file:text-white file:px-4 file:py-2 file:rounded-md"
-            />
-          </div>
-
           <div className="flex items-center justify-between">
             <label className="inline-flex items-center text-sm text-gray-600">
               <input
                 type="radio"
                 name="usertype"
                 value="customer"
-                checked={formData.usertype === 'customer'}
-                onChange={handleChange}
+                checked={formData.usertype === 'customer'}  
+                onChange={handleChange}  
                 className="form-radio"
               />
               <span className="ml-2">Customer</span>
@@ -152,8 +150,8 @@ const RegistrationPage = () => {
                 type="radio"
                 name="usertype"
                 value="seller"
-                checked={formData.usertype === 'seller'}
-                onChange={handleChange}
+                checked={formData.usertype === 'seller'} 
+                onChange={handleChange}  
                 className="form-radio"
               />
               <span className="ml-2">Seller</span>
@@ -166,7 +164,7 @@ const RegistrationPage = () => {
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          Already have an account? <a href="/login" className="text-blue-500 hover:underline">Login here</a>
+          Already have an account? <a onClick={()=>{navigate("/userlogin")}} className="text-blue-500 hover:underline">Login here</a>
         </p>
       </div>
     </div>
