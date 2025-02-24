@@ -135,3 +135,19 @@ export async function userlogin(req, res) {
     }
 
 
+    export async function changePassword(req, res) {
+        const {email,password}=req.body;
+        try {
+            const user = await userSchema.findOne({email});
+            if (!user) {
+                return res.status(404).send({ message: "User not found." });
+            }
+            console.log(user);
+            const hpassword = await bcrypt.hash(password, 10);
+            await userSchema.updateOne({email},{$set:{password:hpassword}});
+            return res.status(200).send({message:"Password changed successfully."});
+        } catch (error) {
+            return res.status(500).send({message:"an error occur at requesthandler : "+error})
+        }
+    }
+

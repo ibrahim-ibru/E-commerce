@@ -29,7 +29,7 @@ export async function getProducts(req, res) {
         if (!data) {
             return res.status(404).send({ message: "No products found." });
         }
-        return res.status(200).send({ data });
+        return res.status(200).send({message: "Products fetched successfully.", data });
     } catch (error) {
         console.error("Error fetching products:", error);
         res.status(500).send({ message: "Something went wrong. Please try again later." });
