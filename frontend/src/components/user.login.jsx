@@ -30,7 +30,11 @@ const LoginPage = () => {
       const res = await axios.post('http://localhost:3000/api/userlogin', formData);
       if (res.status === 200) {
         setSuccessMessage('Login successful!');
-        // navigate("")
+        console.log(res.data);
+
+        localStorage.setItem('token', res.data.token);
+        
+        navigate("/")
       }
     } catch (error) {
       setErrorMessage('Invalid credentials or something went wrong');
@@ -78,7 +82,7 @@ const LoginPage = () => {
         </form>
 
         <div className="flex items-center justify-between mt-4">
-          <a href="/forgot-password" className="text-sm text-blue-500 hover:underline">Forgot password?</a>
+          <a onClick={()=>{navigate("/forgetpassword")}} className="text-sm text-blue-500 hover:underline">Forgot password?</a>
           <a onClick={()=>{navigate("/userregistration")}} className="text-sm text-blue-500 hover:underline">Create an account</a>
         </div>
       </div>
