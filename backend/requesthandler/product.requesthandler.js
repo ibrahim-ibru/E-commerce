@@ -53,9 +53,7 @@ export async function deleteProduct(req, res) {
 export async function updateProduct(req,res) {
     try{
         const { productname, price, description, image, category, id}=req.body
-        
 
     } catch (error) {
-        
     }
 }
