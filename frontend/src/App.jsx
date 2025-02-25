@@ -8,14 +8,13 @@ import LoginPage from './components/user.login'
 import PumaStore from './components/home'
 import ForgotPassword from './components/forgetpassword'
 import ChangePassword from './components/user.changepassword'
-import { EmailProvider } from './context/email.context'
+import ProfilePage from './components/profile'
 
 function App() {
 
   return (
     <>
     <BrowserRouter>
-      <EmailProvider>
     <Routes>
         <Route path='/' element={<PumaStore/>}/>
       <Route path='/adminlogin' element={<AdminLogin/>}/>
@@ -24,9 +23,8 @@ function App() {
       <Route path='/userlogin' element={<LoginPage/>}/>
       <Route path='/forgetpassword' element={<ForgotPassword/>}/>
       <Route path='/setpassword' element={<ChangePassword/>}/>
-      
+      <Route path='/profile' element={<ProfilePage/>}/>
     </Routes>
-      </EmailProvider>
     </BrowserRouter>
     </>
   )

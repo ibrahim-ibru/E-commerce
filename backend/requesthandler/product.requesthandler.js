@@ -35,3 +35,27 @@ export async function getProducts(req, res) {
         res.status(500).send({ message: "Something went wrong. Please try again later." });
     }
 }
+
+export async function deleteProduct(req, res) {
+    try {
+        const id = req.params.id;
+        const data = await productSchema.findByIdAndDelete(id);
+        if (!data) {
+            return res.status(404).send({ message: "Product not found." });
+        }
+        return res.status(200).send({ message: "Product deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting product:", error);        
+        res.status(500).send({ message: "Something went wrong. Please try again later." });        
+    }
+}
+
+export async function updateProduct(req,res) {
+    try{
+        const { productname, price, description, image, category, id}=req.body
+        
+
+    } catch (error) {
+        
+    }
+}

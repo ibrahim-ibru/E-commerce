@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Filter, Search, Heart, ShoppingCart, User, Menu, X, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-
-
+import axios from 'axios';
 
 const ProductCard = ({ color, price, originalPrice, isDiscount }) => (
   <div className="bg-white p-4 rounded-lg shadow-sm transition-transform hover:shadow-md">
@@ -49,7 +47,6 @@ const MobileMenu = ({ isOpen, onClose }) => {
   );
 };
 
-
 const FilterDropdown = ({ isOpen, onClose }) => {
   const dropdownRef = useRef(null);
   
@@ -75,7 +72,7 @@ const FilterDropdown = ({ isOpen, onClose }) => {
       className={`absolute top-full left-0 mt-2 w-72 bg-white border rounded-lg shadow-lg z-50 transform transition-all duration-200 ${
         isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
       }`}
-      >
+    >
       <div className="p-4">
         {/* Price Range */}
         <div className="mb-6">
@@ -148,8 +145,8 @@ const FilterDropdown = ({ isOpen, onClose }) => {
           <div className="grid grid-cols-4 gap-2">
             {[6, 7, 8, 9, 10, 11, 12].map(size => (
               <button
-              key={size}
-              className="px-2 py-1 border rounded hover:bg-gray-50 focus:bg-gray-50 focus:border-black"
+                key={size}
+                className="px-2 py-1 border rounded hover:bg-gray-50 focus:bg-gray-50 focus:border-black"
               >
                 UK {size}
               </button>
@@ -170,32 +167,81 @@ const PumaStore = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // You would typically get this from your auth context/state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userdetails, setUserdetails] = useState({});
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const navigate = useNavigate();
-
+  
+  // Fixed getUserInitial function to use userdetails instead of user
+  const getUserInitial = () => {
+    return userdetails?.name ? userdetails.name.charAt(0).toUpperCase() : "U";
+  };
+  
+  // Added option to toggle profile dropdown
   const handleUserIconClick = () => {
     if (isLoggedIn) {
-      navigate('/profile');
+      setIsProfileDropdownOpen(!isProfileDropdownOpen);
     } else {
       navigate('/userlogin');
     }
   };
 
-  const getUser=async()=>{
+  // Fixed getUser function to log response.data directly 
+  const getUser = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/getuser');
-      const result = await response.data;
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.log("No token found");
+        setIsLoggedIn(false);
+        return;
+      }
+      
+      const response = await axios.get('http://localhost:3000/api/getuser', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
       if (response.status === 200) {
+        console.log("User data from API:", response.data);
+        setUserdetails(response.data);
         setIsLoggedIn(true);
       } else {
+        console.log("Invalid response status:", response.status);
         setIsLoggedIn(false);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching user data:', error);
+      setIsLoggedIn(false);
     }
+  };
+  
+  useEffect(() => {
+    getUser();
+  }, []);
+  
+  useEffect(() => {
+    console.log("Updated userdetails state:", userdetails);
+  }, [userdetails]);
+  
+  const profileDropdownRef = useRef(null);
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    
+    if (isProfileDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
     }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileDropdownOpen]);
 
-  // Navigation bar section updated with user icon click handler
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-black text-white p-4 sticky top-0 z-40">
@@ -228,20 +274,57 @@ const PumaStore = () => {
             </div>
             <Heart className="h-6 w-6 cursor-pointer hover:text-gray-300" />
             <ShoppingCart className="h-6 w-6 cursor-pointer hover:text-gray-300" />
-            <button 
-              onClick={handleUserIconClick}
-              className="group relative"
-              aria-label={isLoggedIn ? "Go to Profile" : "Login"}
-            >
-              <User className="h-6 w-6 cursor-pointer hover:text-gray-300" />
-              {/* Tooltip */}
-              <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">
-                {isLoggedIn ? 'Profile' : 'Login'}
-              </span>
-            </button>
+            <div className="relative" ref={profileDropdownRef}>
+              <button 
+                onClick={handleUserIconClick}
+                className="group relative"
+                aria-label={isLoggedIn ? "Profile menu" : "Login"}
+              >
+              {/* {isLoggedIn ? (
+                <div className=" h-12 w-12  bg-red-500 border-1 border-gray-600 rounded-full flex items-center justify-center">
+                <span className="font-medium ">{getUserInitial()}</span>
+                
+              </div>
+              ) : (
+                
+              )
+              )} */}
+                <User className="h-6 w-6 cursor-pointer hover:text-gray-300" />
+                {/* Tooltip */}
+                <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                  {isLoggedIn ? 'Profile' : 'Login'}
+                </span>
+              </button>
+              
+              {/* Profile Dropdown Menu */}
+              {isLoggedIn && isProfileDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 text-sm text-gray-700 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="font-medium">Hello, {userdetails?.name || 'User'}</p>
+                    <p className="text-xs text-gray-500">{userdetails?.email || ''}</p>
+                  </div>
+                  <a href="/profile" className="block px-4 py-2 hover:bg-gray-100">My Profile</a>
+                  <a href="/orders" className="block px-4 py-2 hover:bg-gray-100">My Orders</a>
+                  <a href="/wishlist" className="block px-4 py-2 hover:bg-gray-100">Wishlist</a>
+                  <button 
+                    onClick={() => {
+                      localStorage.removeItem('token');
+                      setIsLoggedIn(false);
+                      setUserdetails({});
+                      setIsProfileDropdownOpen(false);
+                      navigate('/userlogin');
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
+      
       {/* Mobile Menu */}
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
@@ -257,8 +340,8 @@ const PumaStore = () => {
         </div>
       </div>
 
-       {/* Main Content */}
-       <main className="max-w-7xl mx-auto px-4 py-8">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
           {/* Filter Button with Dropdown */}
           <div className="relative">
@@ -278,7 +361,6 @@ const PumaStore = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-            <span className="text-sm lg:text-base">1006 PRODUCTS</span>
             <div className="relative w-full sm:w-auto">
               <button
                 className="w-full sm:w-auto flex items-center justify-between space-x-2 px-4 py-2 border rounded-md bg-white hover:bg-gray-50"

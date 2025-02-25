@@ -1,21 +1,40 @@
-import { useState } from "react"; // Import useState
-import { useEmailContext } from "../context/email.context";
+import { useState } from "react"; 
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function ChangePassword() {
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const { email } = useEmailContext(); // Access email from context
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError("Passwords don't match!");
     } else {
       setError("");
-      // Handle the password change logic here (e.g., API call)
+      const email = localStorage.getItem("email");
+      // localStorage.removeItem("email");
       console.log(email);
-      alert("Password changed successfully!");
+      try {
+        const res= await axios.post('http://localhost:3000/api/setpassword', { email, password });
+      console.log(res);
+
+      if (res.status === 200) {
+        const { message } = res.data; 
+        alert(message);
+      }
+      else {
+        setError('Something went wrong. Please try again.');
+      }
+
+
+      navigate("/userlogin");
+      } catch (error) {
+        console.log(error);
+        
+      }
     }
   };
 

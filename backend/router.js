@@ -15,7 +15,9 @@ router.post("/userregistration", user.userRegistration);
 router.post("/userlogin", user.userlogin);
 router.get("/getuser",Auth, user.getUser);
 router.post("/forgetpassword", user.forgetPassword);
+router.post("/setpassword", user.changePassword);
 
 // Product
-router.post("/createproduct", product.addProduct);
+router.post("/addproduct", product.addProduct);
+
 export default router;
