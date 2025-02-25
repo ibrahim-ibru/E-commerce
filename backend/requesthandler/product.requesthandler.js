@@ -53,7 +53,14 @@ export async function deleteProduct(req, res) {
 export async function updateProduct(req,res) {
     try{
         const { productname, price, description, image, category, id}=req.body
+        const data=await productSchema.updateOne({_id:id},{$set:{productname, price, description, image, category}});
+        if (!data) {
+            return res.status(404).send({ message: "Product not found." });
+        }
+        return res.status(200).send({ message: "Product updated successfully." });
 
     } catch (error) {
+        console.log(error);
+        
     }
 }
