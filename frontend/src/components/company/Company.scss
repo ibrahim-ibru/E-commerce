@@ -1,0 +1,205 @@
+// // company/Company.scss
+// :root {
+//   --primary-color: #2c3e50;
+//   --secondary-color: #34495e;
+//   --accent-color: #3498db;
+//   --text-color: #ecf0f1;
+//   --background-color: #f4f6f7;
+// }
+
+// .company-container {
+//   display: flex;
+//   justify-content: center;
+//   padding: 20px;
+//   background-color: var(--background-color);
+
+//   .company-details {
+//     display: flex;
+//     flex-direction: column;
+//     width: 100%;
+//     max-width: 1200px;
+//     background-color: white;
+//     border-radius: 10px;
+//     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+//     overflow: hidden;
+    
+//     @media (min-width: 768px) {
+//       flex-direction: row;
+//     }
+    
+//     .company-info {
+//       border-right: 4px solid white;
+//       background-color:rgb(175, 177, 178);
+//       color: var(--text-color);
+//       padding: 20px;
+//       display: flex;
+//       flex-direction: column;
+//       width: 100%;
+
+//       @media (min-width: 768px) {
+//         width: 40%;
+//       }
+
+//       .company-header {
+//         display: flex;
+//         justify-content: space-between;
+//         align-items: center;
+//         margin-bottom: 20px;
+        
+//         .company-photo {
+//           color: var(--accent-color);
+//           align-items: center;
+//           margin-left: 40%;
+//           text-align: center;
+//           border: #ecf0f1 solid 2px;
+//           border-radius: 100%;
+//           padding: 20px;
+//         }
+
+//         .action-buttons {
+//           .edit-btn, .save-btn {
+//             background-color:blue;
+//             color: white;
+//             border: none;
+//             padding: 8px 15px;
+//             border-radius: 5px;
+//             display: flex;
+//             align-items: center;
+//             gap: 10px;
+//             cursor: pointer;
+//             transition: background-color 0.3s;
+
+//             &:hover {
+//               background-color: darken(#3498db, 10%);
+//             }
+//           }
+//         }
+//       }
+
+//       .company-fields {
+//         .company-field {
+//           margin-bottom: 15px;
+
+//           label {
+//             display: block;
+//             margin-bottom: 5px;
+//             font-size: 0.9rem;
+//           }
+
+//           .editable-input {
+//             width: 100%;
+//             padding: 10px;
+//             border: 1px solid var(--secondary-color);
+//             border-radius: 5px;
+//             background-color:#ecf0f1;
+//             color: var(--text-color);
+
+//             &:disabled {
+//               background-color: rgba(255,255,255,0.05);
+//               border-color: transparent;
+//             }
+
+//             &:focus {
+//               outline: none;
+//               border-color: var(--accent-color);
+//             }
+//           }
+//         }
+//       }
+//     }
+
+//     .company-categories {
+//       background-color:rgb(26, 163, 201);
+//       padding: 20px;
+//       width: 100%;
+
+//       @media (min-width: 768px) {
+//         width: 60%;
+//       }
+
+//       .categories-header {
+//         display: flex;
+//         justify-content: space-between;
+//         align-items: center;
+//         margin-bottom: 20px;
+
+//         h3 {
+//           color: var(--text-color);
+//           margin: 0;
+//         }
+
+//         .category-actions {
+//           display: flex;
+//           align-items: center;
+//           gap: 15px;
+
+//           .orders-link {
+//           margin: 20px;
+//             color: rgb(249, 247, 247);
+//             text-decoration: none;
+//             font-size: 1rem;
+//           }
+
+//           .add-product-btn {
+//             color: rgb(78, 78, 19);
+//             background-color: white;
+//             border-radius: 50%;
+//             width: 35px;
+//             height: 35px;
+//             display: flex;
+//             justify-content: center;
+//             align-items: center;
+//             transition: background-color 0.3s;
+
+//             &:hover {
+//               background-color: darken(#3498db, 10%);
+//             }
+//           }
+//         }
+//       }
+
+//       .category-list {
+//         display: flex;
+//         flex-wrap: wrap;
+//         gap: 20px;
+
+//         .category-item {
+//           background-color: var(--accent-color);
+//           color: var(--text-color);
+//           text-decoration: none;
+//           padding: 8px 15px;
+//           border-radius: 20px;
+//           font-size: 0.8rem;
+//           transition: background-color 0.3s;
+
+//           &:hover {
+//             // background-color: darken(#3498db, 10%);
+//             background-color: darken($color: #3498db, $amount: 10%);
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+
+// // Responsive adjustments
+// @media (max-width: 480px) {
+//   .company-container {
+//     padding: 10px;
+
+//     .company-details {
+//       flex-direction: column;
+
+//       .company-info, .company-categories {
+//         width: 100%;
+//       }
+
+//       .company-header {
+//         flex-direction: column;
+//         align-items: center;
+//         gap: 15px;
+//       }
+//     }
+//   }
+// }
+
