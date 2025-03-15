@@ -22,6 +22,8 @@ import './App.css'
 import AdminLogin from './Components/AdminLogin';
 import AdminDashboard from './Components/AdminDashboard';
 import SellerProducts from './Components/SellerProducts';
+import { ToastContainer } from "react-toastify";
+import Footer from './Components/Footer';
 
 
 const App = () => {
@@ -33,6 +35,7 @@ const App = () => {
 
   return (
     <>
+    <ToastContainer />
     <BrowserRouter>
 
                 <Navbar username={username} role={role} loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
@@ -40,6 +43,9 @@ const App = () => {
         <Route path='/' Component={Login}/>
         <Route path='/email' Component={Email}/>
         <Route path='/signup' Component={Signup}/>
+      </Routes>
+        
+      <Routes>
         <Route path='/home' element={<Home  setUsername={setUsername} setRole={setRole} setLoggedIn={setLoggedIn}/>}/>
         <Route path='/profile' element={<Profile role={role}  setUsername={setUsername} loggedIn={loggedIn} setRole={setRole} setLoggedIn={setLoggedIn}/>}/>
         <Route path='/company' element={<Company  setUsername={setUsername} setRole={setRole} setLoggedIn={setLoggedIn}/>}/>
@@ -60,6 +66,7 @@ const App = () => {
       <Route path="/admin/seller/:sellerId/products" element={<SellerProducts />} />
         
       </Routes>
+        {/* <Footer loggedIn={loggedIn} /> */}
     </BrowserRouter>
     </>
   )

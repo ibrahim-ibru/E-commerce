@@ -7,7 +7,8 @@ const userSchema=new mongoose.Schema({
     fname:{type:String},
     lname:{type:String},
     gender:{type:String},
-    phone:{type:Number}
+    phone:{type:Number},
+    isBlocked: { type: Boolean, default: false }
 })
 
 export default mongoose.model.Users || mongoose.model("User",userSchema);

@@ -16,11 +16,6 @@ router.route("/editaddress").post(Auth,user.editAddress);
 router.route("/company").get(Auth,user.company); 
 router.route("/editcompany").post(Auth,user.editCompany);
 router.route("/editcategory").post(Auth,user.editCategory);
-router.route("/addproduct").post(Auth,user.addProduct);
-router.route("/products/:category").get(Auth,user.products);
-router.route("/getproduct/:_id").get(Auth,user.getProduct);
-router.route("/editproduct/:_id").put(Auth,user.editProduct);
-router.route("/product/:_id").get(Auth,user.product);
 router.route("/addtocart").post(Auth,user.addToCart);
 router.route("/getcart").get(Auth,user.getCart); 
 router.route("/getsinglecart/:pid").get(Auth,user.getSingleCart); 
@@ -34,7 +29,15 @@ router.route("/getorders").get(Auth,user.getOrders);
 router.route("/getsellorders").get(Auth,user.getsellOrders);
 router.route('/search').get(user.searchItemZ);
 router.route("/updateorderstatus").post(Auth,user.updateorderstatus);
-
+router.route("/removefromcart").delete(Auth,user.removeFromCart)
+// product routes
+router.route("/addproduct").post(Auth,user.addProduct);
+router.route("/products/:category").get(Auth,user.products);
+router.route("/getproduct/:_id").get(Auth,user.getProduct);
+router.route("/editproduct/:_id").put(Auth,user.editProduct);
+router.route("/product/:_id").get(Auth,user.product);
+router.route("/blockproduct/:_id").put(Auth,user.blockProduct);
+router.route("/deleteproduct/:_id").delete(Auth,user.deleteProduct);
 
 // Admin routes
 router.route("/admin/create").post(user.createAdmin);

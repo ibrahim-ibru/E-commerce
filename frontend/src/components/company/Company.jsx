@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaPlus, FaEdit, FaSave } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaSave, FaTags } from 'react-icons/fa';
 import { BsFillBuildingsFill } from "react-icons/bs";
 import route from "../route";
 import { Link } from 'react-router-dom';
@@ -75,113 +75,131 @@ const Company = ({ setUsername, setRole, setLoggedIn }) => {
   };
 
   return (
-    <div className="flex justify-center p-5 bg-gray-100">
-      <div className="flex flex-col md:flex-row w-full max-w-6xl bg-white rounded-lg shadow-md overflow-hidden">
-        {/* Company Info Panel */}
-        <div className="border-r-4 border-white bg-gray-400 text-gray-100 p-5 flex flex-col w-full md:w-2/5">
-          <div className="flex justify-between items-center mb-5">
-            <div className="text-blue-400 items-center ml-[40%] text-center border-2 border-gray-100 rounded-full p-5">
-              <BsFillBuildingsFill size={60} />
-            </div>
-
-            <div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+          {/* Company Info Panel */}
+          <div className="w-full md:w-2/5 bg-gradient-to-br from-gray-800 to-gray-900 text-white p-6">
+            <div className="flex flex-col items-center mb-6">
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-full mb-4 border-2 border-blue-400/30 shadow-lg">
+                <BsFillBuildingsFill size={60} className="text-blue-400" />
+              </div>
+              
               {!isEditable ? (
                 <button 
-                  className="bg-blue-600 text-white border-none py-2 px-4 rounded flex items-center gap-2 cursor-pointer transition-colors hover:bg-blue-700" 
+                  className="bg-blue-600 text-white py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-300 hover:bg-blue-700 hover:shadow-md transform hover:-translate-y-1"
                   onClick={handleEditClick}
                 >
-                  <FaEdit /> Edit
+                  <FaEdit /> Edit Details
                 </button>
               ) : (
                 <button 
-                  className="bg-blue-600 text-white border-none py-2 px-4 rounded flex items-center gap-2 cursor-pointer transition-colors hover:bg-blue-700" 
+                  className="bg-green-600 text-white py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-300 hover:bg-green-700 hover:shadow-md transform hover:-translate-y-1"
                   onClick={handleSave}
                 >
-                  <FaSave /> Save
+                  <FaSave /> Save Changes
                 </button>
               )}
             </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-300">Company Name</label>
+                <input 
+                  type="text" 
+                  value={company.name} 
+                  name="name"
+                  onChange={handleChange} 
+                  disabled={!isEditable}
+                  className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white disabled:opacity-70 transition-all"
+                  placeholder="Enter company name"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-300">Location</label>
+                <input 
+                  type="text" 
+                  name="location"
+                  value={company.location} 
+                  onChange={handleChange} 
+                  disabled={!isEditable}
+                  className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white disabled:opacity-70 transition-all"
+                  placeholder="Enter location"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-300">GSTIN</label>
+                <input 
+                  type="text" 
+                  name="gstin"
+                  value={company.gstin} 
+                  onChange={handleChange} 
+                  disabled={!isEditable}
+                  className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white disabled:opacity-70 transition-all"
+                  placeholder="Enter GSTIN number"
+                />
+              </div>
+              
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-300">Contact</label>
+                <input 
+                  type="text" 
+                  name="contact"
+                  value={company.contact} 
+                  onChange={handleChange} 
+                  disabled={!isEditable}
+                  className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white disabled:opacity-70 transition-all"
+                  placeholder="Enter contact information"
+                />
+              </div>
+            </div>
           </div>
 
-          <div>
-            <div className="mb-4">
-              <label className="block mb-1 text-sm">Company Name:</label>
-              <input 
-                type="text" 
-                value={company.name} 
-                name="name"
-                onChange={handleChange} 
-                disabled={!isEditable}
-                className="w-full p-2 border border-gray-600 rounded bg-gray-100 text-gray-100 focus:outline-none focus:border-blue-500 disabled:bg-opacity-5 disabled:border-transparent"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block mb-1 text-sm">Location:</label>
-              <input 
-                type="text" 
-                name="location"
-                value={company.location} 
-                onChange={handleChange} 
-                disabled={!isEditable}
-                className="w-full p-2 border border-gray-600 rounded bg-gray-100 text-gray-100 focus:outline-none focus:border-blue-500 disabled:bg-opacity-5 disabled:border-transparent"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block mb-1 text-sm">GSTIN:</label>
-              <input 
-                type="text" 
-                name="gstin"
-                value={company.gstin} 
-                onChange={handleChange} 
-                disabled={!isEditable}
-                className="w-full p-2 border border-gray-600 rounded bg-gray-100 text-gray-100 focus:outline-none focus:border-blue-500 disabled:bg-opacity-5 disabled:border-transparent"
-              />
+          {/* Categories Panel */}
+          <div className="w-full md:w-3/5 bg-white p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-8 border-b pb-4">
+              <div className="flex items-center mb-4 sm:mb-0">
+                <FaTags className="text-blue-600 mr-2" size={24} />
+                <h3 className="text-2xl font-semibold text-gray-800">Product Categories</h3>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-4">
+                <Link 
+                  to="/orders" 
+                  className="text-gray-700 hover:text-blue-600 transition-colors flex items-center"
+                >
+                  Orders
+                </Link>
+                <span className="hidden sm:inline text-gray-400">|</span>
+                <span className="text-gray-700">Products</span>
+                
+                <Link 
+                  to="/addproduct" 
+                  className="ml-2 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-all hover:shadow-md transform hover:-translate-y-1"
+                  title="Add New Product"
+                >
+                  <FaPlus />
+                </Link>
+              </div>
             </div>
             
-            <div className="mb-4">
-              <label className="block mb-1 text-sm">Contact:</label>
-              <input 
-                type="text" 
-                name="contact"
-                value={company.contact} 
-                onChange={handleChange} 
-                disabled={!isEditable}
-                className="w-full p-2 border border-gray-600 rounded bg-gray-100 text-gray-100 focus:outline-none focus:border-blue-500 disabled:bg-opacity-5 disabled:border-transparent"
-              />
+            <div className="flex flex-wrap gap-3">
+              {categories.length > 0 ? (
+                categories.map((category, index) => (
+                  <Link 
+                    to={`/products/${encodeURIComponent(category)}`} 
+                    key={index} 
+                    className="bg-gray-100 text-gray-800 py-2 px-4 rounded-full text-sm transition-all hover:bg-blue-100 hover:text-blue-700 hover:shadow border border-transparent hover:border-blue-200"
+                  >
+                    {category}
+                  </Link>
+                ))
+              ) : (
+                <p className="text-gray-500 italic">No categories available</p>
+              )}
             </div>
-          </div>
-        </div>
-
-        {/* Categories Panel */}
-        <div className="bg-blue-500 p-5 w-full md:w-3/5">
-          <div className="flex justify-between items-center mb-5">
-            <h3 className="text-white text-2xl m-0">Categories</h3>
-            <div className="flex items-center gap-4">
-              <Link to="/orders" className="text-white no-underline text-base m-5">
-                Orders Confirmation
-              </Link>
-              <p className="text-white">
-                Products
-              </p> 
-              
-              <Link to="/addproduct" className="text-yellow-800 bg-white rounded-full w-8 h-8 flex justify-center items-center transition-colors hover:bg-blue-700">
-                <FaPlus />
-              </Link>
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-5">
-            {categories.map((category, index) => (
-              <Link 
-                to={`/products/${encodeURIComponent(category)}`} 
-                key={index} 
-                className="bg-blue-400 text-white no-underline py-2 px-4 rounded-full text-sm transition-colors hover:bg-blue-600"
-              >
-                {category}
-              </Link>
-            ))}
           </div>
         </div>
       </div>

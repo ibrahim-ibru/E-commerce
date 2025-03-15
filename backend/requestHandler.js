@@ -30,9 +30,11 @@ export async function home(req,res) {
     try {
         const _id=req.user.userId;
         const user=await loginSchema.findOne({_id});
-        const products=await productSchema.find({
-            sellerId: { $not: { $eq: _id} }
-          })
+        const products = await productSchema.find({
+            sellerId: { $ne: _id },  
+            isBlocked: { $ne: true } 
+          });
+          
         return res.status(200).send({username:user.username,role:user.role,products});
     } catch (error) {
         return res.status(404).send({msg:"error"})
@@ -139,6 +141,7 @@ export async function editCategory(req,res) {
 export async function addProduct(req,res) {
     try {
         const product=req.body;
+        console.log(product);
         const id=req.user.userId;
         const data=await productSchema.create({sellerId:id,...product});
         return res.status(201).send({msg:"Adding complete"});
@@ -212,6 +215,48 @@ export async function product(req,res) {
     }
 }
 
+export async function blockProduct(req,res) {
+    try {
+        const {_id}=req.params;
+        const {blocked}=req.body
+        console.log(blocked);
+        
+        
+        const id=req.user.userId;
+        const user=await loginSchema.findOne({_id:id});
+        if(!user)
+            return res.status(403).send({msg:"Unauthorized acces"});
+        const product=await productSchema.findOneAndUpdate({_id},{$set:{isBlocked:blocked}});
+        if(!product)
+            return res.status(404).send({msg:"Product not found"});
+        
+        return res.status(200).send({username:user.username,role:user.role,product})
+        
+    } catch (error) {
+        return res.status(404).send({msg:"error"})
+    }
+}
+
+export async function deleteProduct(req,res) {
+    try {
+        const {_id}=req.params;
+        const id=req.user.userId;
+        console.log("deleted");
+        
+        const user=await loginSchema.findOne({_id:id});
+        if(!user)
+            return res.status(403).send({msg:"Unauthorized acces"});
+        const product=await productSchema.findOneAndDelete({_id});
+        if(!product)
+            return res.status(404).send({msg:"Product not found"});
+        
+        return res.status(200).send({username:user.username,role:user.role,product})
+        
+    } catch (error) {
+        return res.status(404).send({msg:"error"})
+    }
+}
+
 export async function addToCart(req,res) {
     try {
         const cart=req.body;
@@ -222,6 +267,28 @@ export async function addToCart(req,res) {
         return res.status(404).send({msg:"error"})
     }
 }
+
+export async function removeFromCart(req, res) {
+    try {
+      const { id } = req.body;
+      const userId = req.user.userId;
+      
+      // Find and delete the cart item
+      const deletedItem = await cartSchema.findOneAndDelete({
+        _id: id,
+        buyerId: userId
+      });
+      
+      if (!deletedItem) {
+        return res.status(404).send({ msg: "Item not found in cart" });
+      }
+      
+      return res.status(201).send({ msg: "Removed from Cart" });
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send({ msg: "Server error" });
+    }
+  }
 
 export async function getCart(req,res) {
     try {
@@ -487,9 +554,7 @@ export async function signUp(req,res) {
           return res.status(404).send({msg:"fields are empty"});
 
       if(password!==cpassword)
-          return res.status(404).send({msg:"password not matched"})
-      console.log("hai");
-      
+          return res.status(404).send({msg:"password not matched"})      
       bcrypt.hash(password,10).then((hashedPassword)=>{
         loginSchema.create({email,username,password:hashedPassword,role}).then(()=>{
               return res.status(201).send({msg:"success"});

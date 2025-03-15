@@ -8,7 +8,8 @@ const productSchema=new mongoose.Schema({
     brand:{type:String},
     price:{type:Number},
     sizeQuantities:{type:Object},
-    pimages:{type:Array}
+    pimages:{type:Array},
+    isBlocked: { type: Boolean, default: false }
 })
 
 export default mongoose.model.Products || mongoose.model("Product",productSchema);

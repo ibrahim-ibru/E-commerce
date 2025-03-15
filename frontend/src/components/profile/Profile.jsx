@@ -1,24 +1,23 @@
-// src/components/profile/Profile.js
 import React, { useEffect, useState } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import route from "../route";
-import './Profile.scss';
 
-const Profile = ({setUsername,setRole,loggedIn,role,setLoggedIn}) => {
-  const value=localStorage.getItem('Auth');
+const Profile = ({ setUsername, setRole, loggedIn, role, setLoggedIn }) => {
+  const value = localStorage.getItem('Auth');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isEditingAddresses, setIsEditingAddresses] = useState(false);
-   const [isSeller, setIsSeller] = useState(false); 
+  const [isSeller, setIsSeller] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [profile, setProfile] = useState({});
-  const [countCart,setCountCart]=useState(0);
-  const [countWishlist,setCountWishlist]=useState(0);
-  const [countOrders,setCountOrders]=useState(0);
-  const navigate=useNavigate();
-  useEffect(()=>{
+  const [countCart, setCountCart] = useState(0);
+  const [countWishlist, setCountWishlist] = useState(0);
+  const [countOrders, setCountOrders] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
     getEssentials();
-  },[])
+  }, []);
 
   useEffect(() => {
     if (role === "seller") {
@@ -26,27 +25,29 @@ const Profile = ({setUsername,setRole,loggedIn,role,setLoggedIn}) => {
     }
   }, [role]);
 
-  const getEssentials=async()=>{
+  const getEssentials = async () => {
     try {
-      
-      const {status,data}=await axios.get(`${route()}profile`,{headers:{"Authorization":`Bearer ${value}`}});
-      if (status==200) {
+      const { status, data } = await axios.get(`${route()}profile`, {
+        headers: { "Authorization": `Bearer ${value}` }
+      });
+
+      if (status === 200) {
         setUsername(data.username);
         setRole(data.role);
         setLoggedIn(true);
-        if(data.profile)
-          setProfile({...data.profile});
-        if(data.address)
+        if (data.profile)
+          setProfile({ ...data.profile });
+        if (data.address)
           setAddresses(data.address.addresses);
         setCountCart(data.cart);
         setCountWishlist(data.wishlist);
-        setCountOrders(data.orders)
+        setCountOrders(data.orders);
       }
+    } catch (error) {
+      console.log("error fetching profile data", error);
     }
-     catch (error) {
-      console.log("error");
-    }
-  }
+  };
+
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({
@@ -54,20 +55,28 @@ const Profile = ({setUsername,setRole,loggedIn,role,setLoggedIn}) => {
       [name]: value,
     }));
   };
-  const handleSubmitProfile=async()=>{
-    if(isEditingProfile){
-      const {status,data}=await axios.post(`${route()}edituser`,profile,{headers:{"Authorization":`Bearer ${value}`}});
-      if (status===201) {
-        alert(data.msg)
-      }else{
-        alert("error")
+
+  const handleSubmitProfile = async () => {
+    if (isEditingProfile) {
+      try {
+        const { status, data } = await axios.post(
+          `${route()}edituser`,
+          profile,
+          { headers: { "Authorization": `Bearer ${value}` } }
+        );
+
+        if (status === 201) {
+          alert(data.msg);
+        } else {
+          alert("An error occurred while updating profile");
+        }
+      } catch (error) {
+        alert("Failed to update profile");
       }
-      setIsEditingProfile(!isEditingProfile);
     }
-    else{
-      setIsEditingProfile(!isEditingProfile);
-    }
-  }
+    setIsEditingProfile(!isEditingProfile);
+  };
+
   const handleAddressChange = (index, e) => {
     const { name, value } = e.target;
     const updatedAddresses = [...addresses];
@@ -80,346 +89,380 @@ const Profile = ({setUsername,setRole,loggedIn,role,setLoggedIn}) => {
 
   const handleAddAddress = () => {
     setAddresses([
-      { houseNumber: "", houseName: "", place: "", pincode: "", postOffice: "",city:"",phone:"",name:"" },
+      {
+        houseNumber: "",
+        houseName: "",
+        place: "",
+        pincode: "",
+        postOffice: "",
+        city: "",
+        phone: "",
+        name: ""
+      },
       ...addresses,
-      
     ]);
+    setIsEditingAddresses(true);
   };
-  const handleSubmitAddress=async()=>{
-    if(isEditingAddresses){
-      const {status,data}=await axios.post(`${route()}editaddress`,addresses,{headers:{"Authorization":`Bearer ${value}`}});
-      if (status===201) {
-        alert(data.msg)
-      }else{
-        alert("error")
+
+  const handleSubmitAddress = async () => {
+    if (isEditingAddresses) {
+      try {
+        const { status, data } = await axios.post(
+          `${route()}editaddress`,
+          addresses,
+          { headers: { "Authorization": `Bearer ${value}` } }
+        );
+
+        if (status === 201) {
+          alert(data.msg);
+        } else {
+          alert("An error occurred while updating addresses");
+        }
+      } catch (error) {
+        alert("Failed to update addresses");
       }
-      setIsEditingAddresses(!isEditingAddresses);
     }
-    else{
-      setIsEditingAddresses(!isEditingAddresses);
-    }
-  }
+    setIsEditingAddresses(!isEditingAddresses);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('Auth');
+    navigate('/');
+    setLoggedIn(false);
+  };
+
   return (
-    <div className="profile-container">
-      {/* Profile Section */}
-      <div className="profile-header">
-        {/* <h1>User Details</h1>
-        <div className="profile-pic">
-         <img src="./images/profile.png"  alt="" />
-        </div> */}
-       
-            <div className="flex items-center mb-4">
-          <img
-            className="h-12 w-12 rounded-full"
-            src="./images/profile.png"
-            alt="Profile"
-          />
-          <div className="ml-1 px-6">
-            <div className="text-gray-600">Hello,</div>
-            <div className="text-xl font-semibold">{profile.fname==""?"Flipkart Customer":(profile.fname+" " +profile.lname)||profile==""}</div>
-          </div>
-        </div>
-        
-              <div className="mr-5">{isSeller && (
-              <Link to={'/company'}>
-                <button  className="seller-btn bg-blue-300 hover:bg-gray-300 hover:text-black">
-                  Seller
-                </button>
-              </Link>
-            )}</div>
-        <div className="profile-info">
-          <div className="input-container">
-          <div>
-                <label className="block text-gray-700"> first Name</label>
-                <input
-                  type="text"
-                  name="fname"
-                  value={profile.fname}
-                  onChange={handleProfileChange}
-                  disabled={!isEditingProfile}
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        {/* Profile Header */}
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 py-6 px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center">
+              <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center shadow-md">
+                <img
+                  className="h-14 w-14 rounded-full object-cover"
+                  src="./images/profile.png"
+                  alt="Profile"
                 />
               </div>
-
-              <div>
-                <label className="block text-gray-700"> last Name</label>
-                <input
-                  type="text"
-                  name="lname"
-                  value={profile.lname}
-                  onChange={handleProfileChange}
-                  disabled={!isEditingProfile}
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              <div className="ml-4 text-white">
+                <div className="text-sm font-medium">Hello,</div>
+                <div className="text-xl font-bold">
+                  {profile.fname ? `${profile.fname} ${profile.lname}` : "Flipkart Customer"}
+                </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-gray-700">Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={profile.phone}
-                  onChange={handleProfileChange}
-                  disabled={!isEditingProfile}
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700">Email</label>
-                <input
-                  type="text"
-                  name="email"
-                  value={profile.email}
-                  onChange={handleProfileChange}
-                  disabled={!isEditingProfile}
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-          </div>
+            <div className="mt-4 md:mt-0 flex gap-4">
+              {isSeller && (
+                <Link to="/company">
+                  <button className="bg-white text-blue-600 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 transition duration-300 shadow-md">
+                    Seller Dashboard
+                  </button>
+                </Link>
+              )}
 
-
-          <div className="gender">
-              <label>
-              Gender:
-              </label>
-            <label>
-              <input
-                type="radio"
-                name="gender"
-                value="male"
-                checked={profile.gender === "male"}
-                onChange={handleProfileChange}
-                disabled={!isEditingProfile}
-              />
-              Male
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="gender"
-                value="female"
-                checked={profile.gender === "female"}
-                onChange={handleProfileChange}
-                disabled={!isEditingProfile}
-              />
-              Female
-            </label>
-          </div>
-          <button onClick={handleSubmitProfile} className="savedit">
-            {isEditingProfile ? "Save Profile" : "Edit Profile"}
-          </button>
-        </div>
-        <div className=" flex items-center text-red-600 cursor-pointer ">
-            
-            <button onClick={()=>{
-              localStorage.removeItem('Auth');
-              navigate('/');
-              setLoggedIn(!loggedIn);
-  }} className="log-out-btn bg-white text-red-700 hover:bg-red-700 hover:text-yellow-300"><div className="flex"><svg
-  className="h-6 w-6"
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none"
-  viewBox="0 0 24 24"
-  stroke="currentColor"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth={2}
-    d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"
-  />
-</svg><p>Logout</p></div></button>
-          </div>
-      </div>
-
-      {/* Addresses Section */}
-      <div className="address-section">
-        <div className="navHeader">
-          <div className="head">
-            <Link to={'/mywishlist'}>My Wishlist
-            <div className="count">{countWishlist}</div></Link>
-          </div>
-          <div className="border"></div>
-          <div className="head">
-          <Link to={'/myorders'}>MY Orders
-          <div className="count">{countOrders}</div></Link>
-          </div>
-          <div className="border"></div>
-          <div className="head">
-            <Link to={'/cart'}>My Cart
-            <div className="count">{countCart}</div></Link>
-          </div>
-        </div>
-        
-        <div className="mt-6">
               <button
-                onClick={handleAddAddress}
-                className="w-full bg-blue-400 text-black hover:text-white py-3 rounded-lg hover:bg-gray-700"
+                onClick={handleLogout}
+                className="flex items-center gap-2 bg-white text-red-600 font-medium py-2 px-4 rounded-lg hover:bg-red-50 transition duration-300 shadow-md"
               >
-                + Add Address
+                <svg
+                  className="h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                Logout
               </button>
             </div>
-        {addresses.map((address, index) => (
-  // <div key={index} className="address-container">
-  //   <input
-  //     type="text"
-  //     name="houseName"
-  //     placeholder="House Name"
-  //     value={address.houseName}
-  //     onChange={(e) => handleAddressChange(index, e)}
-  //     disabled={!isEditingAddresses}
-  //     className="hname"
-  //   />
-  //   <input
-  //     type="text"
-  //     name="place"
-  //     placeholder="Place"
-  //     value={address.place}
-  //     onChange={(e) => handleAddressChange(index, e)}
-  //     disabled={!isEditingAddresses}
-  //     className="address-input"
-  //   />
-  //   <input
-  //     type="text"
-  //     name="pincode"
-  //     placeholder="Pincode"
-  //     value={address.pincode}
-  //     onChange={(e) => handleAddressChange(index, e)}
-  //     disabled={!isEditingAddresses}
-  //     className="address-input"
-  //   />
-  //   <input
-  //     type="text"
-  //     name="postOffice"
-  //     placeholder="Post Office"
-  //     value={address.postOffice}
-  //     onChange={(e) => handleAddressChange(index, e)}
-  //     disabled={!isEditingAddresses}
-  //     className="address-input"
-  //   />
-  //   <input
-  //     type="text"
-  //     name="landmark"
-  //     placeholder="Landmark"
-  //     value={address.landmark}
-  //     onChange={(e) => handleAddressChange(index, e)}
-  //     disabled={!isEditingAddresses}
-  //     className="address-input"
-  //   />
-  //   <div className="adrbut">
-      
-  //   <button onClick={handleSubmitAddress} className="address-button">
-  //     {isEditingAddresses ? "Save Address" : "Edit Address"}
-  //   </button>
-  //   </div>
-  // </div>
-  <div className="border p-6 rounded-lg shadow space-y-4">
-          
-                  <div className="text-blue-600 font-medium"> NEW ADDRESS</div>
-                  
-                  
-                  {/* Input Fields */}
-                  <div className="space-y-4">
-                    <div className="flex space-x-4">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700">Name</label>
+          </div>
+        </div>
+
+        {/* User Activity Stats */}
+        <div className="grid grid-cols-3 divide-x divide-gray-200 bg-gray-50">
+          <Link to="/mywishlist" className="p-4 flex flex-col items-center hover:bg-gray-100 transition duration-300">
+            <div className="text-lg font-medium text-gray-700">Wishlist</div>
+            <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mt-1">
+              <span className="text-blue-600 font-semibold">{countWishlist}</span>
+            </div>
+          </Link>
+          <Link to="/myorders" className="p-4 flex flex-col items-center hover:bg-gray-100 transition duration-300">
+            <div className="text-lg font-medium text-gray-700">Orders</div>
+            <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mt-1">
+              <span className="text-blue-600 font-semibold">{countOrders}</span>
+            </div>
+          </Link>
+          <Link to="/cart" className="p-4 flex flex-col items-center hover:bg-gray-100 transition duration-300">
+            <div className="text-lg font-medium text-gray-700">Cart</div>
+            <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mt-1">
+              <span className="text-blue-600 font-semibold">{countCart}</span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Profile Information */}
+        <div className="p-6 md:p-8 border-b border-gray-200">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">Profile Information</h2>
+            <button
+              onClick={handleSubmitProfile}
+              className={`px-4 py-2 rounded-lg font-medium ${isEditingProfile
+                  ? "bg-green-600 text-white hover:bg-green-700"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+                } transition duration-300`}
+            >
+              {isEditingProfile ? "Save Profile" : "Edit Profile"}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">First Name</label>
+              <input
+                type="text"
+                name="fname"
+                value={profile.fname || ""}
+                onChange={handleProfileChange}
+                disabled={!isEditingProfile}
+                className={`w-full p-3 border rounded-lg ${isEditingProfile ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                  } transition duration-300`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Last Name</label>
+              <input
+                type="text"
+                name="lname"
+                value={profile.lname || ""}
+                onChange={handleProfileChange}
+                disabled={!isEditingProfile}
+                className={`w-full p-3 border rounded-lg ${isEditingProfile ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                  } transition duration-300`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Phone</label>
+              <input
+                type="text"
+                name="phone"
+                value={profile.phone || ""}
+                onChange={handleProfileChange}
+                disabled={!isEditingProfile}
+                className={`w-full p-3 border rounded-lg ${isEditingProfile ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                  } transition duration-300`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={profile.email || ""}
+                onChange={handleProfileChange}
+                disabled={!isEditingProfile}
+                className={`w-full p-3 border rounded-lg ${isEditingProfile ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                  } transition duration-300`}
+              />
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <label className="block text-gray-700 font-medium mb-2">Gender</label>
+            <div className="flex space-x-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="male"
+                  checked={profile.gender === "male"}
+                  onChange={handleProfileChange}
+                  disabled={!isEditingProfile}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-gray-700">Male</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="female"
+                  checked={profile.gender === "female"}
+                  onChange={handleProfileChange}
+                  disabled={!isEditingProfile}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-gray-700">Female</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Addresses Section */}
+        <div className="p-6 md:p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">My Addresses</h2>
+            <button
+              onClick={handleAddAddress}
+              className="px-4 py-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 transition duration-300"
+            >
+              Add New Address
+            </button>
+          </div>
+
+          {addresses.length === 0 ? (
+            <div className="bg-gray-50 p-6 rounded-lg text-center text-gray-500">
+              No addresses added yet. Click "Add New Address" to add your first address.
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {addresses.map((address, index) => (
+                <div key={index} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                    <div className="font-medium text-blue-600">
+                      {address.name ? `Address of ${address.name}` : "New Address"}
+                    </div>
+                    <button
+                      onClick={handleSubmitAddress}
+                      className={`px-3 py-1 rounded-md text-sm font-medium ${isEditingAddresses
+                          ? "bg-green-600 text-white hover:bg-green-700"
+                          : "bg-blue-600 text-white hover:bg-blue-700"
+                        } transition duration-300`}
+                    >
+                      {isEditingAddresses ? "Save Address" : "Edit Address"}
+                    </button>
+                  </div>
+
+                  <div className="p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">Name</label>
                         <input
                           type="text"
-                              name="name"
-                              placeholder="Name"
-                              value={address.name}
-                              onChange={(e) => handleAddressChange(index, e)}
-                              disabled={!isEditingAddresses}
-                          className="w-full border border-gray-300 p-2 rounded"
-                          required
+                          name="name"
+                          placeholder="Full Name"
+                          value={address.name || ""}
+                          onChange={(e) => handleAddressChange(index, e)}
+                          disabled={!isEditingAddresses}
+                          className={`w-full p-2 border rounded-md ${isEditingAddresses ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                            } transition duration-300`}
                         />
                       </div>
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700">10-digit mobile number</label>
+
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">Phone</label>
                         <input
                           type="text"
                           name="phone"
-                          value={address.phone}
-                              onChange={(e) => handleAddressChange(index, e)}
-                              disabled={!isEditingAddresses}
-                          className="w-full border border-gray-300 p-2 rounded"
-                          required
-                          maxLength="10"
+                          placeholder="Phone Number"
+                          value={address.phone || ""}
+                          onChange={(e) => handleAddressChange(index, e)}
+                          disabled={!isEditingAddresses}
+                          className={`w-full p-2 border rounded-md ${isEditingAddresses ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                            } transition duration-300`}
                         />
                       </div>
-                    </div>
-                    
-                    <div className="flex space-x-4">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700">Pincode</label>
+
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">House Number</label>
                         <input
                           type="text"
-                          name="pincode"
-                          value={address.pincode}
-                              onChange={(e) => handleAddressChange(index, e)}
-                              disabled={!isEditingAddresses}
-                          className="w-full border border-gray-300 p-2 rounded"
-                          required
-                          maxLength="6"
+                          name="houseNumber"
+                          placeholder="House Number"
+                          value={address.houseNumber || ""}
+                          onChange={(e) => handleAddressChange(index, e)}
+                          disabled={!isEditingAddresses}
+                          className={`w-full p-2 border rounded-md ${isEditingAddresses ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                            } transition duration-300`}
                         />
                       </div>
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700">Post Office</label>
+
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">House Name</label>
+                        <input
+                          type="text"
+                          name="houseName"
+                          placeholder="House Name"
+                          value={address.houseName || ""}
+                          onChange={(e) => handleAddressChange(index, e)}
+                          disabled={!isEditingAddresses}
+                          className={`w-full p-2 border rounded-md ${isEditingAddresses ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                            } transition duration-300`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">Place</label>
+                        <input
+                          type="text"
+                          name="place"
+                          placeholder="Place"
+                          value={address.place || ""}
+                          onChange={(e) => handleAddressChange(index, e)}
+                          disabled={!isEditingAddresses}
+                          className={`w-full p-2 border rounded-md ${isEditingAddresses ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                            } transition duration-300`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">Post Office</label>
                         <input
                           type="text"
                           name="postOffice"
-                          value={address.postOffice}
-                              onChange={(e) => handleAddressChange(index, e)}
-                              disabled={!isEditingAddresses}
-                          className="w-full border border-gray-300 p-2 rounded"
-                          required
+                          placeholder="Post Office"
+                          value={address.postOffice || ""}
+                          onChange={(e) => handleAddressChange(index, e)}
+                          disabled={!isEditingAddresses}
+                          className={`w-full p-2 border rounded-md ${isEditingAddresses ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                            } transition duration-300`}
                         />
                       </div>
-                    </div>
-        
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Address (Area and Street)</label>
-                      <textarea
-                        name="houseName"
-                        rows="4"
-                        value={address.houseName}
-                              onChange={(e) => handleAddressChange(index, e)}
-                              disabled={!isEditingAddresses}
-                        className="w-full border border-gray-300 p-2 rounded"
-                        required
-                      ></textarea>
-                    </div>
-        
-                    <div className="flex space-x-4">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700">City/District/Town</label>
+
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">City</label>
                         <input
                           type="text"
                           name="city"
-                          value={address.city}
-                              onChange={(e) => handleAddressChange(index, e)}
-                              disabled={!isEditingAddresses}
-                          className="w-full border border-gray-300 p-2 rounded"
-                          required
+                          placeholder="City"
+                          value={address.city || ""}
+                          onChange={(e) => handleAddressChange(index, e)}
+                          disabled={!isEditingAddresses}
+                          className={`w-full p-2 border rounded-md ${isEditingAddresses ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                            } transition duration-300`}
                         />
                       </div>
-                      
-                    </div>
-        
-                  
-                  </div>
-                  
-                  
-                  
-                  {/* Buttons */}
-                  <div className="flex justify-end space-x-4 mt-4">
-                  <button onClick={handleSubmitAddress} className="address-button bg-blue-400 hover:gray-600">
-                   {isEditingAddresses ? "Save Address" : "Address"}
-                  </button>
-                  </div>
-              </div>
-))}
 
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">Pin Code</label>
+                        <input
+                          type="text"
+                          name="pincode"
+                          placeholder="Pin Code"
+                          value={address.pincode || ""}
+                          onChange={(e) => handleAddressChange(index, e)}
+                          disabled={!isEditingAddresses}
+                          className={`w-full p-2 border rounded-md ${isEditingAddresses ? "border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" : "bg-gray-50 border-gray-200"
+                            } transition duration-300`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

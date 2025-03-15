@@ -5,6 +5,8 @@ import loginSchema from "../models/login.model.js";
 export default async function Auth(req,res,next) {
     try {
         const key=req.headers.authorization;
+        console.log(key);
+        
         if(!key)
             return res.status(403).send({msg:"Unauthorized access"});
         const token=key.split(" ")[1];
@@ -14,9 +16,10 @@ export default async function Auth(req,res,next) {
         if (user && user.isBlocked) {
             return res.status(403).send({ msg: "Your account has been blocked" });
         }
-        console.log(user);
         
         req.user=auth;
+        console.log("next");
+        
         next();
     } catch (error) {
         return res.status(403).send({msg:"session expired please log in again"});

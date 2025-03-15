@@ -79,8 +79,10 @@ const AddProduct = ({setUsername, setRole, setLoggedIn }) => {
                 [size]: parseInt(e.target.value, 10) || 0,
             },
         });
-    };
 
+        
+    };
+    
     const handleProductDetailChange = (e) => {
         const { name, value } = e.target;
         setProductDetails({
@@ -88,7 +90,7 @@ const AddProduct = ({setUsername, setRole, setLoggedIn }) => {
             [name]: value,
         });
     };
-
+    
     const handleImageChange = async (e) => {
         const files = Array.from(e.target.files);
         const imagePromises = files.map(convertToBase64);
@@ -99,7 +101,7 @@ const AddProduct = ({setUsername, setRole, setLoggedIn }) => {
             pimages: images,
         });
     };
-
+    
     const convertToBase64 = (file) => {
         return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
@@ -108,9 +110,10 @@ const AddProduct = ({setUsername, setRole, setLoggedIn }) => {
             fileReader.onerror = (error) => reject(error);
         });
     };
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(productDetails.sizeQuantities);
         try {
             const { status, data } = await axios.post(
                 `${route()}addproduct`, 
